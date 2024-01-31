@@ -3,7 +3,7 @@ var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
 
-var encryptionKey = "your_secret_key"; 
+var encryptionKey = "din_secret_key"; 
 
 app.MapPost("/encrypt", (HttpContext context) =>
 {
