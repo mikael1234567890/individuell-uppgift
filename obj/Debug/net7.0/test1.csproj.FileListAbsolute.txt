@@ -1,0 +1,5 @@
+C:\Users\micke\OneDrive\Skrivbord\test1\obj\Debug\net7.0\test1.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\micke\OneDrive\Skrivbord\test1\obj\Debug\net7.0\test1.AssemblyInfoInputs.cache
+C:\Users\micke\OneDrive\Skrivbord\test1\obj\Debug\net7.0\test1.AssemblyInfo.cs
+C:\Users\micke\OneDrive\Skrivbord\test1\obj\Debug\net7.0\test1.csproj.CoreCompileInputs.cache
+C:\Users\micke\OneDrive\Skrivbord\test1\obj\Debug\net7.0\test1.MvcApplicationPartsAssemblyInfo.cache
