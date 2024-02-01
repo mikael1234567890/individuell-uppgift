@@ -1,85 +1,80 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using System;
-using System.IO;
-using System.Security.Cryptography;
 using System.Text;
 
-var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
-
-app.MapGet("/", () => "Hello World!");
-
-var encryptionKey = "din_secret_key"; 
-
-app.MapPost("/encrypt", (HttpContext context) =>
+[Route("api/[controller]")]
+[ApiController]
+public class RovarspraketController : ControllerBase
 {
-    using (var reader = new StreamReader(context.Request.Body))
+    static void Main()
     {
-        var plaintext = reader.ReadToEnd();
-        var encryptedText = Encrypt(plaintext, encryptionKey);
-        return context.Response.WriteAsync(encryptedText);
-    }
-});
-
-app.MapPost("/decrypt", (HttpContext context) =>
-{
-    using (var reader = new StreamReader(context.Request.Body))
+      [HttpPost("encrypt")]
+    public IActionResult Encrypt([FromBody] RovarspraketRequest request)
     {
-        var encryptedText = reader.ReadToEnd();
-        var decryptedText = Decrypt(encryptedText, encryptionKey);
-        return context.Response.WriteAsync(decryptedText);
-    }
-});
-
-app.Run();
-
-string Encrypt(string text, string key)
-{
-    using (Aes aesAlg = Aes.Create())
-    {
-        aesAlg.Key = Encoding.UTF8.GetBytes(key);
-        aesAlg.IV = new byte[16];
-
-        ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
-
-        using (MemoryStream msEncrypt = new MemoryStream())
+        if (request == null || string.IsNullOrEmpty(request.Text))
         {
-            using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
-            {
-                using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
-                {
-                    swEncrypt.Write(text);
-                }
-            }
-
-            var encryptedData = msEncrypt.ToArray();
-            return Convert.ToBase64String(encryptedData);
+            return BadRequest("Text is required.");
         }
+
+        string encryptedText = EncryptRovarspraket(request.Text);
+        return Ok(new { EncryptedText = encryptedText });
+    }
+
+    [HttpPost("decrypt")]
+    public IActionResult Decrypt([FromBody] RovarspraketRequest request)
+    {
+        if (request == null || string.IsNullOrEmpty(request.Text))
+        {
+            return BadRequest("Text is required.");
+        }
+
+        string decryptedText = DecryptRovarspraket(request.Text);
+        return Ok(new { DecryptedText = decryptedText });
+    }
+
+    private string EncryptRovarspraket(string text)
+    {
+        StringBuilder result = new StringBuilder();
+
+        foreach (char c in text)
+        {
+            if ("aeiouy".Contains(Char.ToLower(c)) || char.IsWhiteSpace(c))
+            {
+                result.Append(c);
+            }
+            else
+            {
+                result.Append(c + "o" + Char.ToLower(c));
+            }
+        }
+
+        return result.ToString();
+    }
+
+    private string DecryptRovarspraket(string text)
+    {
+        StringBuilder result = new StringBuilder();
+        int i = 0;
+
+        while (i < text.Length)
+        {
+            result.Append(text[i]);
+
+            if (!char.IsWhiteSpace(text[i]))
+            {
+                i += 2;
+            }
+            else
+            {
+                i++;
+            }
+        }
+
+        return result.ToString();
+    }
     }
 }
-
-string Decrypt(string encryptedText, string key)
+public class RovarspraketRequest
 {
-    using (Aes aesAlg = Aes.Create())
-    {
-        aesAlg.Key = Encoding.UTF8.GetBytes(key);
-        aesAlg.IV = new byte[16];
-
-        ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
-
-        using (MemoryStream msDecrypt = new MemoryStream(Convert.FromBase64String(encryptedText)))
-        {
-            using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-            {
-                using (StreamReader srDecrypt = new StreamReader(csDecrypt))
-                {
-                    return srDecrypt.ReadToEnd();
-                }
-            }
-        }
-    }
+    public string Text { get; set; }
 }
