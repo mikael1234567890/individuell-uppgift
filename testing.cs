@@ -1,80 +1,59 @@
-using Microsoft.AspNetCore.Mvc;
-using System;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System.IO;
 using System.Text;
 
-[Route("api/[controller]")]
-[ApiController]
-public class RovarspraketController : ControllerBase
+
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+
+app.MapPost("/encrypt", async context =>
 {
-    static void Main()
+    string requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
+    string encryptedText = EncryptText(requestBody);
+    await context.Response.WriteAsync(encryptedText);
+});
+
+app.MapPost("/decrypt", async context =>
+{
+    string requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
+    string decryptedText = DecryptText(requestBody);
+    await context.Response.WriteAsync(decryptedText);
+});
+
+app.Run();
+
+string EncryptText(string text)
+{
+    char[] vowels = { 'a', 'e', 'i', 'o', 'u', 'å', 'ä', 'ö' };
+
+    StringBuilder encryptedText = new StringBuilder();
+    foreach (char c in text)
     {
-      [HttpPost("encrypt")]
-    public IActionResult Encrypt([FromBody] RovarspraketRequest request)
-    {
-        if (request == null || string.IsNullOrEmpty(request.Text))
+        encryptedText.Append(c);
+        if (char.IsLetter(c) && !vowels.Contains(char.ToLower(c)))
         {
-            return BadRequest("Text is required.");
+            encryptedText.Append('o').Append(char.ToLower(c));
         }
-
-        string encryptedText = EncryptRovarspraket(request.Text);
-        return Ok(new { EncryptedText = encryptedText });
     }
 
-    [HttpPost("decrypt")]
-    public IActionResult Decrypt([FromBody] RovarspraketRequest request)
-    {
-        if (request == null || string.IsNullOrEmpty(request.Text))
-        {
-            return BadRequest("Text is required.");
-        }
-
-        string decryptedText = DecryptRovarspraket(request.Text);
-        return Ok(new { DecryptedText = decryptedText });
-    }
-
-    private string EncryptRovarspraket(string text)
-    {
-        StringBuilder result = new StringBuilder();
-
-        foreach (char c in text)
-        {
-            if ("aeiouy".Contains(Char.ToLower(c)) || char.IsWhiteSpace(c))
-            {
-                result.Append(c);
-            }
-            else
-            {
-                result.Append(c + "o" + Char.ToLower(c));
-            }
-        }
-
-        return result.ToString();
-    }
-
-    private string DecryptRovarspraket(string text)
-    {
-        StringBuilder result = new StringBuilder();
-        int i = 0;
-
-        while (i < text.Length)
-        {
-            result.Append(text[i]);
-
-            if (!char.IsWhiteSpace(text[i]))
-            {
-                i += 2;
-            }
-            else
-            {
-                i++;
-            }
-        }
-
-        return result.ToString();
-    }
-    }
+    return encryptedText.ToString();
 }
-public class RovarspraketRequest
+
+string DecryptText(string text)
 {
-    public string Text { get; set; }
+    StringBuilder decryptedText = new StringBuilder();
+    for (int i = 0; i < text.Length; i++)
+    {
+        decryptedText.Append(text[i]);
+        if (i < text.Length - 2 && text[i] == 'o' && char.IsLetter(text[i + 1]))
+        {
+            i++; // Skip 'o'
+        }
+    }
+
+    return decryptedText.ToString();
 }
