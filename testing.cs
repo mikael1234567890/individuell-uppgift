@@ -8,6 +8,7 @@ using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseUrls("http://localhost:5000");
 var app = builder.Build();
 
 app.MapPost("/encrypt", async context =>
@@ -17,7 +18,7 @@ app.MapPost("/encrypt", async context =>
     await context.Response.WriteAsync(encryptedText);
 });
 
-app.MapPost("/decrypt", async context =>
+app.MapGet("/decrypt", async context =>
 {
     string requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
     string decryptedText = DecryptText(requestBody);
