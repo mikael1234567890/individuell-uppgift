@@ -19,10 +19,10 @@ jobs:
           dotnet-version: '6.0'
 
       - name: Build project
-        run: dotnet restore && dotnet publish -o site;
+        run: dotnet restore; dotnet publish -o site;
 
       - name: Create zip package
-        run: cd site && zip -r ../site.zip *
+        run: cd site; zip ../site.zip *;
 
       - name: Deploy to AWS EB
         uses: einaregilsson/beanstalk-deploy@v21
