@@ -1,4 +1,0 @@
-c:\Users\micke\OneDrive\Skrivbord\test1\calcuapi\obj\Debug\net6.0\calcuapi.GeneratedMSBuildEditorConfig.editorconfig
-c:\Users\micke\OneDrive\Skrivbord\test1\calcuapi\obj\Debug\net6.0\calcuapi.AssemblyInfoInputs.cache
-c:\Users\micke\OneDrive\Skrivbord\test1\calcuapi\obj\Debug\net6.0\calcuapi.AssemblyInfo.cs
-c:\Users\micke\OneDrive\Skrivbord\test1\calcuapi\obj\Debug\net6.0\calcuapi.csproj.CoreCompileInputs.cache
