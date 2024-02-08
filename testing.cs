@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.IO;
+using System.Linq;
 using System.Text;
-
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://localhost:5000");
@@ -49,10 +49,13 @@ string DecryptText(string text)
     StringBuilder decryptedText = new StringBuilder();
     for (int i = 0; i < text.Length; i++)
     {
-        decryptedText.Append(text[i]);
-        if (i < text.Length - 2 && text[i] == 'o' && char.IsLetter(text[i + 1]))
+        if (i < text.Length - 1 && text[i] == 'o' && char.IsLetter(text[i + 1]))
         {
-            i++; // Skip 'o'
+            i++; 
+        }
+        else
+        {
+            decryptedText.Append(text[i]);
         }
     }
 
